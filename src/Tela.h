@@ -42,12 +42,9 @@ class Tela{
     }
 
 public: void setColumn(int column, boolean state){
-        /*try{
-            if(column < 0 || column > height){
-                throw new InvalidArgumentException;
-            }
-        }catch(InvalidArgumentException e){
-            Serial.println(e.getMessage());    
+        /*
+        if(column < 0 || column > width){
+            throw new InvalidArgumentException("Coluna selecionada ("+column+") fora da tela");
         }*/
         for(int h = 0; h<height; h++){
             arrayLeds[h][column] = state;
@@ -55,12 +52,9 @@ public: void setColumn(int column, boolean state){
     }
 
     public: void setRow(int row, boolean state){
-        /*try{
-            if(row < 0 || row > height){
-                throw new InvalidArgumentException;
-            }
-        }catch(InvalidArgumentException e){
-            Serial.println(e.getMessage());    
+        /*
+        if(row < 0 || row > height){
+            throw new InvalidArgumentException("Linha selecionada ("+row+") fora da tela");
         }*/
         for(int w = 0; w<width; w++){
             arrayLeds[row][w] = state;
@@ -68,12 +62,9 @@ public: void setColumn(int column, boolean state){
     }
 
     public: void setPixel(int row, int column, boolean state){
-        /*try{
-            if(row < 0 || row > height || column < 0 || column > height){
-                throw new InvalidArgumentException;
-            }
-        }catch(InvalidArgumentException e){
-            Serial.println(e.getMessage());    
+        /*
+        if(row < 0 || row > height || column < 0 || column > height){
+            throw new InvalidArgumentException("Pixel selecionado ("+row+", "+column+") fora da tela");
         }*/
         arrayLeds[row][column] = state;
         
