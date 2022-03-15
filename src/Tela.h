@@ -124,7 +124,8 @@ class Tela{
     // desenha uma forma, especificada dentro de uma matrix shape, começando na posição x, y, indo para baixo e para a direita
     void drawShape(Shape* shape, int y, int x){
         
-        int* matriz = shape->matriz;
+        int* matriz = shape->PecaT();
+        matriz = shape->PecaI();
 
         int size = sizeof(matriz)/sizeof(matriz[0]);
 
