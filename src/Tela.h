@@ -1,3 +1,6 @@
+#pragma once
+#include <Shape.h>
+
 class Tela{
 
     private: static const int width = 10;
@@ -11,6 +14,7 @@ class Tela{
 
     /*
     Inicializa o display, obrigatório para funcionamento correto da tela.
+    É chamado automaticamente no construtor
     */
     private: void setDisplay(){
         for(int i = 0; i < height; i++){
@@ -26,12 +30,12 @@ class Tela{
     }
 
     // Retorna a altura da tabela
-    public: int getHeight(){
+    int getHeight(){
         return height;
     }
 
     // Imprime no serial uma representação da tela, sendo os 0 leds apagados e 1, leds ligados
-    public: void printSerial(){
+    void printSerial(){
         for(int i = 0; i < height; i++){
             Serial.print("|");
             for(int j = 0; j < width; j++){
@@ -44,12 +48,12 @@ class Tela{
     }
 
     // LEO me ajuda a limpar a tela do serial pelo amor de deus
-    public: void clearSerial(){
+    void clearSerial(){
         
     }
 
     // Seta a coluna especificada (0-9) com o estado especificado (true/false)
-    public: void setColumn(int column, boolean state){
+    void setColumn(int column, boolean state){
         /*
         if(column < 0 || column > width){
             throw new InvalidArgumentException("Coluna selecionada ("+column+") fora da tela");
@@ -81,7 +85,7 @@ class Tela{
     }
 
     // Seta o display inteiro com o estado espeficicado (true/false)
-    public: void setDisplay(boolean state){
+    void setDisplay(boolean state){
         for(int w = 0; w < width; w++){
             for(int h = 0; h < height; h++){
                 arrayLeds[h][w] = state;
@@ -89,12 +93,43 @@ class Tela{
         }
     }
 
+    // Retorna true somente se todas as posições da linha estiverem ligadas
+    bool isRowOn(int row){
+        for(int w = 0; w<width; w++){
+            if(!arrayLeds[row][w]){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Retorna true somente se todas as posições da coluna estiverem ligadas
+    bool isColumnOn(int column){
+        for(int h = 0; h<height; h++){
+            if(!arrayLeds[h][column]){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Retorna true se o pixel estiver ligado, caso contrario, retorna false
+    bool isPixelOn(int row, int column){
+        if(!arrayLeds[row][column]){
+            return false;
+        }
+        return true;
+    }
+
     // desenha uma forma, especificada dentro de uma matrix shape, começando na posição x, y, indo para baixo e para a direita
-    public: void drawShape(int* shape, int y, int x){
-        int LarguraArray = sizeof(shape) / 2;
-        Serial.println(LarguraArray);
-        for(int i = 0; i<LarguraArray; i++){
-            arrayLeds[y][x+i] = shape[i];
+    void drawShape(Shape* shape, int y, int x){
+        
+        int* matriz = shape->matriz;
+
+        int size = sizeof(matriz)/sizeof(matriz[0]);
+
+        for(int i = 0; i<size; i++){
+            arrayLeds[y][x + i] = matriz[i];
         }
     }
 

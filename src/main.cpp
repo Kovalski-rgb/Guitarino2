@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <Tela.h>
+#include <Shape.h>
 
 Tela screen;
-
-int shape[5]{1, 1, 1, 1, 1};
+Shape shape;
 
 void setup() {
   // put your setup code here, to run once:
@@ -16,5 +16,6 @@ void loop() {
   // put your main code here, to run repeatedly:
   screen.printSerial();
   screen.setDisplay(false);
-  screen.drawShape(shape, 3, 3);
+  // passa o endereço de shape como paramentro
+  screen.drawShape(&shape, 3, 3);
 }
