@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <ArduinoQueue.h>
+#include "tonePlayer.h"
 
 // ---------------------------------------------- CONSTANTS AND GLOBAL VARIABLES
 #define LED_PIN 3 // for data transfer to strip
@@ -36,7 +37,7 @@ struct RGB {
     byte b;
 };
 
-/*Data to process pixels on display*/
+/*Data to process pixels on display */
 struct ScreenPixel{
   byte yPos;
   byte xPos;
@@ -45,6 +46,7 @@ struct ScreenPixel{
   bool pressed;
   RGB color;
 };
+
 
 ArduinoQueue<ScreenPixel> pixelQueue(LED_COUNT);
 ArduinoQueue<ScreenPixel> auxQueue(LED_COUNT);
@@ -58,6 +60,7 @@ RGB lifeStates[3];
 ScreenPixel dropPixel(ScreenPixel pixel);
 void drawLine(byte height, RGB color);
 void lifeUpdater();
+void screenProcessor();
 
 // ---------------------------------------------- MAIN FUNCTIONS
 
@@ -91,6 +94,8 @@ void setup() {
   buttonPressed[2] = false;
   buttonPressed[3] = false;
   buttonPressed[4] = false;
+
+  playMelody();
 }
 
 void loop(){
@@ -104,50 +109,53 @@ void loop(){
     pixelQueue.enqueue({0, 4, millis(), false, false, {255, 100, 0}});
   }
   
+  // playMelody();
   while(!pixelQueue.isEmpty()){
-    ScreenPixel pixel = pixelQueue.dequeue();
-
-    pixel = dropPixel(pixel);
-
-    for(int i = 0; i < BUTTON_COUNT; i++){
-      if(digitalRead(buttons[i])){
-        if(pixel.xPos == i){
-          if((!buttonPressed[i] && pixel.yPos == LINE_HEIGHT) || pixel.yPos-1 == LINE_HEIGHT){
-            pixel.pressed = true;
-            if(pixel.yPos == LINE_HEIGHT){
-              strip.setPixelColor((pixel.yPos*DISPLAY_WIDTH)-DISPLAY_WIDTH+pixel.xPos, 0, 0, 0);  
-              life++;
-            }else{
-              life+=2;
-            }
-            strip.setPixelColor(14, pixel.color.r, pixel.color.g, pixel.color.b);
-            strip.show();
-          } else {
-            if(!buttonPressed[i])
-              life--;
-          }
-          buttonPressed[i] = true;
-        }
-      } else {
-        buttonPressed[i] = false;
-      }
-    }
-
-    if(!pixel.offScreen && !pixel.pressed){
-      auxQueue.enqueue(pixel);
-    } else {
-      if(!pixel.pressed || pixel.offScreen)
-        life--;
-    }
-
+    screenProcessor();
   }
-
   lifeUpdater();
 
   while(!auxQueue.isEmpty()){
     pixelQueue.enqueue(auxQueue.dequeue());
   }
 
+}
+
+void screenProcessor(){
+  ScreenPixel pixel = pixelQueue.dequeue();
+
+  pixel = dropPixel(pixel);
+
+  for(int i = 0; i < BUTTON_COUNT; i++){
+    if(digitalRead(buttons[i])){
+      if(pixel.xPos == i){
+        if((!buttonPressed[i] && pixel.yPos == LINE_HEIGHT) || pixel.yPos-1 == LINE_HEIGHT){
+          pixel.pressed = true;
+          if(pixel.yPos == LINE_HEIGHT){
+            strip.setPixelColor((pixel.yPos*DISPLAY_WIDTH)-DISPLAY_WIDTH+pixel.xPos, 0, 0, 0);  
+            life++;
+          }else{
+            life+=2;
+          }
+          strip.setPixelColor(14, pixel.color.r, pixel.color.g, pixel.color.b);
+          strip.show();
+        } else {
+          if(!buttonPressed[i])
+            life--;
+        }
+        buttonPressed[i] = true;
+      }
+    } else {
+      buttonPressed[i] = false;
+    }
+  }
+
+  if(!pixel.offScreen && !pixel.pressed){
+    auxQueue.enqueue(pixel);
+  } else {
+    if(!pixel.pressed || pixel.offScreen)
+      life--;
+  }
 }
 
 /*
